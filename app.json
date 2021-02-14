@@ -17,6 +17,8 @@
       "adaptiveIcon": {
         "backgroundColor": "#FFFFFF"
       }
-    }
+    },
+    "description": "Meals App application by using React Navigation module. In this app you can choose a category and get infos about meals",
+    "githubUrl": "https://github.com/Yeniceri98/Meals-App"
   }
 }

@@ -1,15 +1,39 @@
-import React from 'react'
+import React, { useEffect, useCallback } from 'react'
 import { Button, StyleSheet, Text, View, ScrollView, Image } from 'react-native'
 
-import { MEALS } from '../data/dummy-data';
+// import { MEALS } from '../data/dummy-data';      Redux eklendikten sonra yorum satırına aldık
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';      // Header Buttons
 import CustomHeaderButton from '../components/CustomHeaderButton';
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleFavorite } from '../store/actions/meals';
 
 
 const MealDetailsScreen = (props) => {
     const mealId = props.navigation.getParam("mealID");            // "MealsScreen.js" den "mealID" adında param aldık
 
-    const selectedMeal = MEALS.find(meal => meal.id === mealId);
+
+    // const selectedMeal = MEALS.find(meal => meal.id === mealId);
+    // NOT: Redux eklendikten sonra yorum satırına aldık. Bu fonksiyonu güncelleyerek aşağıda kullanacağız
+
+
+    // Redux:
+    const availableMeals = useSelector(state => state.meals.meals);
+
+    const selectedMeal = availableMeals.find(meal => meal.id === mealId);
+
+
+    // Dispatch:
+    const dispatch = useDispatch();
+
+    const toggleFavoriteHandler = useCallback(() => {       // Sonsuz bir döngü olmaması için useCallback ekliyoruz
+        // dispatch(toggleFavorite(selectedMeal.id));       // Alttaki de olur bu da
+        dispatch(toggleFavorite(mealId));
+    }, [dispatch, mealId])
+
+    useEffect(() => {
+        props.navigation.setParams({ toggleFav: toggleFavoriteHandler });    // navigationOptions'a "toggleFav" adında param yolluyoruz"
+    }, [toggleFavoriteHandler])
+
 
     return (
         // <View style={styles.screen}>
@@ -42,16 +66,31 @@ const MealDetailsScreen = (props) => {
 
 // Dynamic Navigation Header
 MealDetailsScreen.navigationOptions = navigationData => {
-    const mealId = navigationData.navigation.getParam("mealID");            
-    const selectedMeal = MEALS.find(meal => meal.id === mealId);
+    //nconst mealId = navigationData.navigation.getParam("mealID");            
+
+    // const selectedMeal = MEALS.find(meal => meal.id === mealId);
+    // NOT: "selectedMeal" ı yorum satırına aldım. "mealTitle" adında param yollayarak veri geçişi sağlayacağız
+    // NOT: "useSelector" bu fonksiyonun içinde kullanılamaz. Bu yüzden param yollayarak bu sorunu çözüyoruz
+
+    const mealTitle = navigationData.navigation.getParam("mealTitle");
+
+    const toggleFavorite = navigationData.navigation.getParam("toggleFav");
 
     return {
-        headerTitle: selectedMeal.title,
+        // headerTitle: selectedMeal.title,
+        // NOT: Bu kısmı yorum satırına aldım. Çünkü Redux kullanacağız
+
+        headerTitle: mealTitle,     // Redux eklenince 
         headerRight: () => (
             <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
-                <Item title="Favorite" iconName="star" onPress={() => {      // https://icons.expo.fyi/AntDesign/star  ----->  icon name (star) buradan geliyor
-                    console.log("Marked as favorite")
-                }}/>
+                <Item 
+                    title="Favorite"     
+                    iconName="star"       // https://icons.expo.fyi/AntDesign/star  ----->  icon name (star) buradan geliyor
+                    // onPress={() => {      
+                    //     console.log("Marked as favorite")
+                    // }}
+                    onPress={toggleFavorite}
+                />
             </HeaderButtons>
         )
     }

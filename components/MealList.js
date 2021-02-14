@@ -9,8 +9,9 @@ const MealList = (props) => {
             <MealItem 
                 onSelectMeal={() => {
                     props.navigation.navigate({ routeName: "MealDetails", params: {      // Yemeklerden birine basınca "MealDetails" sayfasına geçecek. Veri geçişi için de "params" kullanıyoruz
-                        mealID: itemData.item.id
-                    } })
+                        mealID: itemData.item.id,
+                        mealTitle: itemData.item.title    // Redux'da navgigationOptions'a param kullanarak erişmek için ekledik
+                    }})
                 }}
                 title={itemData.item.title} 
                 duration={itemData.item.duration}

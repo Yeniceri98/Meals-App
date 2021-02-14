@@ -11,9 +11,22 @@ import { enableScreens } from 'react-native-screens';       // Optimizasyon içi
 
 import MealsNavigator from './navigation/MealsNavigator';
 
-console.disableYellowBox = true;       // Warning mesajlarının gözükmesini engeller
+// Redux Imports:
+import { createStore, combineReducers } from 'redux'    
+import { Provider } from 'react-redux';                 // "Provider", return kısmında MealsNavigator'ı kapsayacak şekilde yerleştirilecek
+import mealsReducer from './store/reducers/meals';
 
-enableScreens();        // Optimizasyon
+
+console.disableYellowBox = true;    // Warning mesajlarının gözükmesini engeller
+enableScreens();                    // Optimizasyon
+
+
+// Redux:
+const rootReducer = combineReducers({
+    meals: mealsReducer                     // Soldaki isimlendirmeyi istediğimiz gibi yapabiliriz
+})
+
+const store = createStore(rootReducer);     // "Provider" ın aldığı "store" propunda buradaki değişkeni atayacağız
 
 
 const fetchFonts = () => {
@@ -22,6 +35,7 @@ const fetchFonts = () => {
         'OpenSans-Bold' : require('./assets/fonts/OpenSans-Bold.ttf')
     })
 }
+
 
 export default function App() {
     const [fontLoaded, setFontLoaded] = useState(false);
@@ -42,10 +56,13 @@ export default function App() {
         //     <TabNavigator />
         // </NavigationContainer>
 
-        <MealsNavigator />
 
+        <Provider store={store}>
+            <MealsNavigator />
+        </Provider>
     );
 }
+
 
 // const styles = StyleSheet.create({
 //     container: {
@@ -89,7 +106,7 @@ export default function App() {
 // import { createBottomTabNavigator } from 'react-navigation-tabs'; şeklinde import etmeliyiz
 
 
-// ___ 2-B)createMaterialBottomTabNavigator        (Android'de bu navigator'ı ve react native paper'ı atayacağız)
+// ___ 2-B)createMaterialBottomTabNavigator        (Android'de bu navigator'ı kullanacağız)
 // yarn add react-navigation-material-bottom-tabs react-native-paper
 // import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 // Android telefonlardaki tab görünümüne daha çok uyar
@@ -114,3 +131,10 @@ export default function App() {
 // yarn add @expo/vector-icons
 // components > HeaderButton.js'de icon kullanmak için indirdik
 // Sonrasında "CustomHeaderButton.js" dosyasını "MealDetails.js" de import ettik
+
+
+// ___ REDUX ___
+// https://react-redux.js.org/introduction/quick-start
+// yarn add redux
+// yarn add react-redux
+// Redux için "store" adlı klasör oluşturduk. Bu klasörün içinde de "actions" ve "reducers" adlı 2 klasör oluşturduk

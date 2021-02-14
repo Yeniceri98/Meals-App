@@ -1,11 +1,12 @@
 import React from 'react'
 import { StyleSheet, Text, View, Button } from 'react-native'
-
-import { CATEGORIES, MEALS } from '../data/dummy-data';
-import Colors from '../constants/Colors'
-import { FlatList } from 'react-native-gesture-handler';
-import MealItem from '../components/MealItem';
 import MealList from '../components/MealList';
+
+// import { CATEGORIES, MEALS } from '../data/dummy-data';      MEALS için Redux kullanacağımız için buradan MEALS'ı sildik (Aşağıda sadece CATEGORIES var)
+import { CATEGORIES} from '../data/dummy-data';
+
+// Redux:
+import { useSelector } from 'react-redux';      // "connect" fonksiyonuyla da yapılabiliyor (Biraz daha farklı şekilde)
 
 
 const MealsScreen = (props) => {
@@ -33,17 +34,37 @@ const MealsScreen = (props) => {
     //         />
     //     )
     // }
-
-    // "renderMealItem" fonksiyonunu components'in içindeki "MealList.js" e taşıdım
+    // NOT: "renderMealItem" fonksiyonunu yorum satırına alıp components'in içindeki "MealList.js" e taşıdım
 
 
     const catID = props.navigation.getParam("categoryId");      // "MealCategoriesScreen.js" de "categoryId" adında param alarak bu dosyaya veri geçişi sağlıyoruz
 
-    // const selectedCategory = CATEGORIES.find(cat => cat.id === catID);        Yorum satırına aldım çünkü yeni oluşturulan MEALS datasındaki "categoryID" ye göre işlem yapacağız
+
+    // const selectedCategory = CATEGORIES.find(cat => cat.id === catID);        
+    // NOT: const selectedCategory kısmını yorum satırına aldım çünkü yeni oluşturulan MEALS datasındaki "categoryID" ye göre işlem yapacağız
     
-    const displayedMeals = MEALS.filter(meal => {
-        return meal.categoryId.includes(catID);       // catID'yi içeren categoryID'leri filtreliyoruz
+
+    // const displayedMeals = MEALS.filter(meal => {
+    //     return meal.categoryId.includes(catID);       // catID'yi içeren categoryID'leri filtreliyoruz
+    // })
+    // NOT: const displayedMeals kısmını yorum satırına aldım çünkü aşağıda Redux uygulayacağız
+
+
+    // Redux:
+    const availableMeals = useSelector(state => state.meals.filteredMeals);     // App.js'de "meals" adını vermiştik. store > meals.js'de de initialState'in içinde "filteredMeals" olarak oluşturduğumuz şeye erişmek istedik
+
+    const displayedMeals = availableMeals.filter(meal => {      // MEALS yerine "availableMeals" yazdık
+        return meal.categoryId.includes(catID);        
     })
+
+
+    if (displayedMeals.length === 0) {
+        return (
+            <View style={styles.content}>
+                <Text>No meals found in this filter(s)</Text>
+            </View>
+        )
+    }
 
 
     return (
@@ -58,8 +79,7 @@ const MealsScreen = (props) => {
         //     }} /> */
         //     }
         // </View>
-
-        // Yukarı kısmı yorum satırına aldım çünkü "MealCategories" sayfasındaki kategorilerden birine tıklayınca "Meals" sayfasında basılan kategoriye ait bilgilerin gözükmesini sağlayacağız. Bunu da <FlatList /> ile yapacağız
+        // NOT: Yukarı kısmı yorum satırına aldım çünkü "MealCategories" sayfasındaki kategorilerden birine tıklayınca "Meals" sayfasında basılan kategoriye ait bilgilerin gözükmesini sağlayacağız. Bunu da <FlatList /> ile yapacağız
 
 
         // <View style={styles.screen}>
@@ -70,8 +90,7 @@ const MealsScreen = (props) => {
         //         style={{ width: "100%", padding: 10 }}
         //     />            
         // </View>
-
-        // Yukarı kısmı components'in içindeki "MealList.js" e taşıdım ("FavoriteMealScreen.js" eklendikten sonra bu dosyayla o dosya <MealList /> componentini kullanacak )
+        // NOT: Yukarı kısmı components'in içindeki "MealList.js" e taşıdım ("FavoriteMealScreen.js" eklendikten sonra bu dosyayla o dosya <MealList /> componentini kullanacak )
 
 
         <MealList listData={displayedMeals} navigation={props.navigation} />
@@ -92,8 +111,8 @@ MealsScreen.navigationOptions = (navigationData) => {
     return {
         headerTitle: selectedCategory.title,
 
-        // NOT: Alttaki kısmı yorum satırına aldım çünkü "MealsNavigator.js" dosyasında global bir navigation header styling oluşturduk. Böylece her seferinde style ataması yapmamız gerekmez. Sadece başlık için ekstra ekleme yaparız çünkü her bir sayfanın başlığı farklıdır
 
+        // NOT: Alttaki kısmı yorum satırına aldım çünkü "MealsNavigator.js" dosyasında global bir navigation header styling oluşturduk. Böylece her seferinde style ataması yapmamız gerekmez. Sadece başlık için ekstra ekleme yaparız çünkü her bir sayfanın başlığı farklıdır
         // headerStyle: {
         //     backgroundColor: Platform.OS === "android" ? Colors.secondaryColor : " "
         // },
@@ -108,6 +127,11 @@ export default MealsScreen
 
 const styles = StyleSheet.create({
     screen: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    content: {
         flex: 1,
         justifyContent: "center",
         alignItems: "center"

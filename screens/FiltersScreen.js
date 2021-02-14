@@ -5,6 +5,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import CustomHeaderButton from '../components/CustomHeaderButton';
 import Colors from '../constants/Colors';
+import { useDispatch } from 'react-redux';      // Dispatch
+import { setFilters } from '../store/actions/meals';
 
 
 const FiltersScreen = (props) => {
@@ -23,6 +25,10 @@ const FiltersScreen = (props) => {
     }
 
 
+    // Dispatch
+    const dispatch = useDispatch();
+
+
     // Save butonu için fonksiyon oluşturduk
     // Bu fonksiyonu aşağıdaki useEffect kısmında param atayarak en alttaki navigationOptions kısmında kullanabileceğiz
     const saveFilters = useCallback(() => {
@@ -33,8 +39,9 @@ const FiltersScreen = (props) => {
             lactoseFree: isLactoseFree
         }
 
-        console.log(appliedFilteres);
-    }, [isGlutenFree, isVegan, isVegetarian, isLactoseFree])
+        // Console.log(appliedFilteres);
+        dispatch(setFilters(appliedFilteres));
+    }, [isGlutenFree, isVegan, isVegetarian, isLactoseFree, dispatch])
 
 
     useEffect(() => {
